@@ -53,7 +53,8 @@ export function middleware(request: NextRequest) {
 
   // Redirect to locale-prefixed URL
   const locale = getLocale(request);
-  const newUrl = new URL(`/${locale}${pathname}`, request.url);
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const newUrl = new URL(`/${locale}${pathname}`, siteUrl || request.url);
   newUrl.search = request.nextUrl.search;
 
   return NextResponse.redirect(newUrl);
