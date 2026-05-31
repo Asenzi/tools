@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Link from 'next/link';
 import { Container } from './Container';
 import { Code2, Search } from 'lucide-react';
