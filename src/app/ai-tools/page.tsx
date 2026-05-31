@@ -25,6 +25,7 @@ export default function AiToolsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {aiTools.map((tool) => {
             const Icon = (Icons as any)[tool.icon] || Sparkles;
+            const content = tool.content.en;
             return (
               <Link key={tool.slug} href={`/ai-tools/${tool.slug}`}>
                 <Card className="h-full hover:shadow-lg transition-shadow">
@@ -35,8 +36,8 @@ export default function AiToolsPage() {
                       </div>
                       <Badge variant="secondary">{tool.category}</Badge>
                     </div>
-                    <CardTitle className="text-lg">{tool.name}</CardTitle>
-                    <CardDescription>{tool.description}</CardDescription>
+                    <CardTitle className="text-lg">{content.name}</CardTitle>
+                    <CardDescription>{content.description}</CardDescription>
                   </CardHeader>
                 </Card>
               </Link>
