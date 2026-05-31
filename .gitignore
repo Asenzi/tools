@@ -46,3 +46,4 @@ prisma/*.db-journal
 
 # local tooling
 .playwright-mcp/
+deploy.tar
