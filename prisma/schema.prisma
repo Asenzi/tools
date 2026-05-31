@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// AI 使用日志 - 用于限流
+model AiUsageLog {
+  id        String   @id @default(cuid())
+  ip        String
+  toolSlug  String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+  @@index([toolSlug])
+}
+
+// AI 生成日志 - 用于记录和分析
+model AiGenerationLog {
+  id        String   @id @default(cuid())
+  toolSlug  String
+  prompt    String
+  result    String
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([toolSlug])
+  @@index([createdAt])
+}
