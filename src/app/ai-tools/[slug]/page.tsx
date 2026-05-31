@@ -28,14 +28,15 @@ export async function generateMetadata({ params }: { params: SlugParams }) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://devtools-hub.com';
   const url = `${siteUrl}/ai-tools/${tool.slug}`;
+  const content = tool.content.en;
 
   return {
-    title: `${tool.name} - AI Tool | DevTools Hub`,
-    description: tool.description,
-    keywords: tool.keywords.join(', '),
+    title: `${content.name} - AI Tool | DevTools Hub`,
+    description: content.description,
+    keywords: tool.keywords.en.join(', '),
     openGraph: {
-      title: tool.name,
-      description: tool.description,
+      title: content.name,
+      description: content.description,
       url,
       type: 'website',
     },
@@ -55,10 +56,11 @@ export default async function AiToolPage({ params }: { params: SlugParams }) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://devtools-hub.com';
   const url = `${siteUrl}/ai-tools/${tool.slug}`;
+  const content = tool.content.en;
 
   const breadcrumbItems = [
     { name: 'AI Tools', url: '/ai-tools' },
-    { name: tool.name, url: `/ai-tools/${tool.slug}` },
+    { name: content.name, url: `/ai-tools/${tool.slug}` },
   ];
 
   // Get the component dynamically - convert slug to PascalCase
@@ -71,8 +73,8 @@ export default async function AiToolPage({ params }: { params: SlugParams }) {
 
   return (
     <>
-      <StructuredData data={generateToolSchema(tool, url)} />
-      <StructuredData data={generateFAQSchema(tool.faqs)} />
+      <StructuredData data={generateToolSchema({ ...tool, ...content } as any, url)} />
+      <StructuredData data={generateFAQSchema(content.faqs)} />
       <StructuredData data={generateBreadcrumbSchema(breadcrumbItems.map(item => ({ name: item.name, url: `${siteUrl}${item.url}` })))} />
 
       <div className="py-12">
@@ -84,9 +86,9 @@ export default async function AiToolPage({ params }: { params: SlugParams }) {
               <div className="p-3 bg-primary/10 rounded-lg">
                 <Icon className="h-8 w-8" />
               </div>
-              <h1 className="text-4xl font-bold">{tool.name}</h1>
+              <h1 className="text-4xl font-bold">{content.name}</h1>
             </div>
-            <p className="text-xl text-muted-foreground">{tool.description}</p>
+            <p className="text-xl text-muted-foreground">{content.description}</p>
           </div>
 
           {/* AI Tool Component */}
@@ -98,7 +100,7 @@ export default async function AiToolPage({ params }: { params: SlugParams }) {
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Use Cases</h2>
             <div className="grid gap-4 md:grid-cols-2">
-              {tool.useCases.map((useCase, index) => (
+              {content.useCases.map((useCase, index) => (
                 <Card key={index}>
                   <CardContent className="pt-6">
                     <p className="text-muted-foreground">{useCase}</p>
@@ -112,7 +114,7 @@ export default async function AiToolPage({ params }: { params: SlugParams }) {
           <section className="mb-12">
             <h2 className="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
             <div className="space-y-4">
-              {tool.faqs.map((faq, index) => (
+              {content.faqs.map((faq, index) => (
                 <Card key={index}>
                   <CardHeader>
                     <CardTitle className="text-lg">{faq.question}</CardTitle>
@@ -133,6 +135,7 @@ export default async function AiToolPage({ params }: { params: SlugParams }) {
                 {tool.relatedTools.map((relatedSlug) => {
                   const relatedTool = getAiToolBySlug(relatedSlug);
                   if (!relatedTool) return null;
+                  const relatedContent = relatedTool.content.en;
                   const RelatedIcon = (Icons as any)[relatedTool.icon] || Sparkles;
                   return (
                     <Link key={relatedSlug} href={`/ai-tools/${relatedSlug}`}>
@@ -140,7 +143,7 @@ export default async function AiToolPage({ params }: { params: SlugParams }) {
                         <CardHeader>
                           <div className="flex items-center gap-3 mb-2">
                             <RelatedIcon className="h-5 w-5" />
-                            <CardTitle className="text-base">{relatedTool.name}</CardTitle>
+                            <CardTitle className="text-base">{relatedContent.name}</CardTitle>
                           </div>
                         </CardHeader>
                       </Card>
