@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { use, useState } from 'react';
 import Link from 'next/link';
 import * as Icons from 'lucide-react';
 import { Code2, Search, Sparkles } from 'lucide-react';
@@ -11,7 +11,10 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { Badge } from '@/components/ui/badge';
 import { searchAll } from '@/lib/search';
 
-export default function LocaleSearchPage({ params }: { params: { locale: Locale } }) {
+type LocaleParams = Promise<{ locale: Locale }>;
+
+export default function LocaleSearchPage({ params }: { params: LocaleParams }) {
+  const { locale } = use(params);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ReturnType<typeof searchAll>>([]);
 
@@ -60,8 +63,8 @@ export default function LocaleSearchPage({ params }: { params: { locale: Locale 
                 const Icon = (Icons as any)[tool.icon] || (result.type === 'ai-tool' ? Sparkles : Code2);
                 const href =
                   result.type === 'ai-tool'
-                    ? `/${params.locale}/ai-tools/${tool.slug}`
-                    : `/${params.locale}/tools/${tool.slug}`;
+                    ? `/${locale}/ai-tools/${tool.slug}`
+                    : `/${locale}/tools/${tool.slug}`;
 
                 return (
                   <Link key={`${result.type}-${tool.slug}`} href={href}>

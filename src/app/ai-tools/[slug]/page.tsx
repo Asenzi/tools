@@ -10,14 +10,17 @@ import * as AiToolComponents from '@/components/ai-tools';
 import * as Icons from 'lucide-react';
 import { Sparkles } from 'lucide-react';
 
+type SlugParams = Promise<{ slug: string }>;
+
 export async function generateStaticParams() {
   return aiTools.map((tool) => ({
     slug: tool.slug,
   }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const tool = getAiToolBySlug(params.slug);
+export async function generateMetadata({ params }: { params: SlugParams }) {
+  const { slug } = await params;
+  const tool = getAiToolBySlug(slug);
 
   if (!tool) {
     return {};
@@ -42,8 +45,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default function AiToolPage({ params }: { params: { slug: string } }) {
-  const tool = getAiToolBySlug(params.slug);
+export default async function AiToolPage({ params }: { params: SlugParams }) {
+  const { slug } = await params;
+  const tool = getAiToolBySlug(slug);
 
   if (!tool) {
     notFound();

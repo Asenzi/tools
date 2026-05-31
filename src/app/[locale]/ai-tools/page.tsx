@@ -8,20 +8,24 @@ import { Sparkles } from 'lucide-react';
 import { Locale } from '@/i18n/config';
 import { getDictionary } from '@/i18n/dictionaries';
 
+type LocaleParams = Promise<{ locale: Locale }>;
+
 export async function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'zh' }];
 }
 
-export async function generateMetadata({ params }: { params: { locale: Locale } }) {
-  const dict = getDictionary(params.locale);
+export async function generateMetadata({ params }: { params: LocaleParams }) {
+  const { locale } = await params;
+  const dict = getDictionary(locale);
   return {
     title: dict['aiTools.title'],
     description: dict['aiTools.description'],
   };
 }
 
-export default function AiToolsPage({ params }: { params: { locale: Locale } }) {
-  const dict = getDictionary(params.locale);
+export default async function AiToolsPage({ params }: { params: LocaleParams }) {
+  const { locale } = await params;
+  const dict = getDictionary(locale);
 
   return (
     <div className="py-12">
@@ -36,9 +40,9 @@ export default function AiToolsPage({ params }: { params: { locale: Locale } }) 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {aiTools.map((tool) => {
             const Icon = (Icons as any)[tool.icon] || Sparkles;
-            const content = tool.content[params.locale];
+            const content = tool.content[locale];
             return (
-              <Link key={tool.slug} href={`/${params.locale}/ai-tools/${tool.slug}`}>
+              <Link key={tool.slug} href={`/${locale}/ai-tools/${tool.slug}`}>
                 <Card className="h-full hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex items-center gap-3 mb-3">

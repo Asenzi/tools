@@ -1,15 +1,19 @@
 import { Container } from '@/components/layout/Container';
 import { Locale } from '@/i18n/config';
 
-export async function generateMetadata({ params }: { params: { locale: Locale } }) {
+type LocaleParams = Promise<{ locale: Locale }>;
+
+export async function generateMetadata({ params }: { params: LocaleParams }) {
+  const { locale } = await params;
   return {
-    title: params.locale === 'zh' ? '服务条款' : 'Terms of Service',
-    description: params.locale === 'zh' ? 'DevTools Hub 服务条款' : 'Terms of service for DevTools Hub',
+    title: locale === 'zh' ? '服务条款' : 'Terms of Service',
+    description: locale === 'zh' ? 'DevTools Hub 服务条款' : 'Terms of service for DevTools Hub',
   };
 }
 
-export default function LocaleTermsPage({ params }: { params: { locale: Locale } }) {
-  const isZh = params.locale === 'zh';
+export default async function LocaleTermsPage({ params }: { params: LocaleParams }) {
+  const { locale } = await params;
+  const isZh = locale === 'zh';
 
   return (
     <div className="py-12">

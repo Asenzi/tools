@@ -13,6 +13,8 @@ import { Code2 } from 'lucide-react';
 import { Locale } from '@/i18n/config';
 import { getDictionary } from '@/i18n/dictionaries';
 
+type ToolPageParams = Promise<{ locale: Locale; slug: string }>;
+
 export async function generateStaticParams() {
   const params: { locale: Locale; slug: string }[] = [];
   const locales: Locale[] = ['en', 'zh'];
@@ -26,18 +28,19 @@ export async function generateStaticParams() {
   return params;
 }
 
-export async function generateMetadata({ params }: { params: { locale: Locale; slug: string } }) {
-  const tool = getToolBySlug(params.slug);
+export async function generateMetadata({ params }: { params: ToolPageParams }) {
+  const { locale, slug } = await params;
+  const tool = getToolBySlug(slug);
   if (!tool) return {};
 
-  const content = tool.content[params.locale];
+  const content = tool.content[locale];
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://devtools-hub.com';
 
   return {
     title: `${content.name} - Free Online Tool`,
     description: content.description,
     alternates: {
-      canonical: `${siteUrl}/${params.locale}/tools/${tool.slug}`,
+      canonical: `${siteUrl}/${locale}/tools/${tool.slug}`,
       languages: {
         'en': `${siteUrl}/en/tools/${tool.slug}`,
         'zh': `${siteUrl}/zh/tools/${tool.slug}`,
@@ -46,21 +49,22 @@ export async function generateMetadata({ params }: { params: { locale: Locale; s
   };
 }
 
-export default function ToolPage({ params }: { params: { locale: Locale; slug: string } }) {
-  const dict = getDictionary(params.locale);
-  const tool = getToolBySlug(params.slug);
+export default async function ToolPage({ params }: { params: ToolPageParams }) {
+  const { locale, slug } = await params;
+  const dict = getDictionary(locale);
+  const tool = getToolBySlug(slug);
 
   if (!tool) {
     notFound();
   }
 
-  const content = tool.content[params.locale];
+  const content = tool.content[locale];
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://devtools-hub.com';
-  const url = `${siteUrl}/${params.locale}/tools/${tool.slug}`;
+  const url = `${siteUrl}/${locale}/tools/${tool.slug}`;
 
   const breadcrumbItems = [
-    { name: dict['nav.tools'], url: `/${params.locale}/tools` },
-    { name: content.name, url: `/${params.locale}/tools/${tool.slug}` },
+    { name: dict['nav.tools'], url: `/${locale}/tools` },
+    { name: content.name, url: `/${locale}/tools/${tool.slug}` },
   ];
 
   const ToolComponent = (ToolComponents as any)[tool.component];
@@ -167,10 +171,10 @@ export default function ToolPage({ params }: { params: { locale: Locale; slug: s
                 {tool.relatedTools.map((relatedSlug) => {
                   const relatedTool = getToolBySlug(relatedSlug);
                   if (!relatedTool) return null;
-                  const relatedContent = relatedTool.content[params.locale];
+                  const relatedContent = relatedTool.content[locale];
                   const RelatedIcon = (Icons as any)[relatedTool.icon] || Code2;
                   return (
-                    <Link key={relatedSlug} href={`/${params.locale}/tools/${relatedSlug}`}>
+                    <Link key={relatedSlug} href={`/${locale}/tools/${relatedSlug}`}>
                       <Card className="h-full hover:shadow-lg transition-shadow">
                         <CardHeader>
                           <div className="flex items-center gap-3 mb-2">

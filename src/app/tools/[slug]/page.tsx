@@ -11,14 +11,17 @@ import * as ToolComponents from '@/components/tools';
 import * as Icons from 'lucide-react';
 import { Code2 } from 'lucide-react';
 
+type SlugParams = Promise<{ slug: string }>;
+
 export async function generateStaticParams() {
   return tools.map((tool) => ({
     slug: tool.slug,
   }));
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }) {
-  const tool = getToolBySlug(params.slug);
+export async function generateMetadata({ params }: { params: SlugParams }) {
+  const { slug } = await params;
+  const tool = getToolBySlug(slug);
 
   if (!tool) {
     return {};
@@ -43,8 +46,9 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
-export default function ToolPage({ params }: { params: { slug: string } }) {
-  const tool = getToolBySlug(params.slug);
+export default async function ToolPage({ params }: { params: SlugParams }) {
+  const { slug } = await params;
+  const tool = getToolBySlug(slug);
 
   if (!tool) {
     notFound();

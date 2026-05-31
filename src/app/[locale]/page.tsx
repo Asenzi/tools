@@ -10,19 +10,22 @@ import * as Icons from 'lucide-react';
 import { Locale } from '@/i18n/config';
 import { getDictionary } from '@/i18n/dictionaries';
 
+type LocaleParams = Promise<{ locale: Locale }>;
+
 export async function generateStaticParams() {
   return [{ locale: 'en' }, { locale: 'zh' }];
 }
 
-export async function generateMetadata({ params }: { params: { locale: Locale } }) {
-  const dict = getDictionary(params.locale);
+export async function generateMetadata({ params }: { params: LocaleParams }) {
+  const { locale } = await params;
+  const dict = getDictionary(locale);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://devtools-hub.com';
 
   return {
     title: dict['home.title'],
     description: dict['home.description'],
     alternates: {
-      canonical: `${siteUrl}/${params.locale}`,
+      canonical: `${siteUrl}/${locale}`,
       languages: {
         'en': `${siteUrl}/en`,
         'zh': `${siteUrl}/zh`,
@@ -31,8 +34,9 @@ export async function generateMetadata({ params }: { params: { locale: Locale } 
   };
 }
 
-export default function HomePage({ params }: { params: { locale: Locale } }) {
-  const dict = getDictionary(params.locale);
+export default async function HomePage({ params }: { params: LocaleParams }) {
+  const { locale } = await params;
+  const dict = getDictionary(locale);
   const popularTools = tools.slice(0, 6);
   const popularAiTools = aiTools.slice(0, 4);
 
@@ -62,7 +66,7 @@ export default function HomePage({ params }: { params: { locale: Locale } }) {
               <Code2 className="h-6 w-6" />
               <h2 className="text-2xl font-bold">{dict['home.popularTools']}</h2>
             </div>
-            <Link href={`/${params.locale}/tools`}>
+            <Link href={`/${locale}/tools`}>
               <Button variant="ghost">
                 {dict['home.viewAll']} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -71,9 +75,9 @@ export default function HomePage({ params }: { params: { locale: Locale } }) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {popularTools.map((tool) => {
               const Icon = (Icons as any)[tool.icon] || Code2;
-              const content = tool.content[params.locale];
+              const content = tool.content[locale];
               return (
-                <Link key={tool.slug} href={`/${params.locale}/tools/${tool.slug}`}>
+                <Link key={tool.slug} href={`/${locale}/tools/${tool.slug}`}>
                   <Card className="h-full hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <div className="flex items-center gap-3 mb-2">
@@ -98,7 +102,7 @@ export default function HomePage({ params }: { params: { locale: Locale } }) {
               <Sparkles className="h-6 w-6" />
               <h2 className="text-2xl font-bold">{dict['home.aiTools']}</h2>
             </div>
-            <Link href={`/${params.locale}/ai-tools`}>
+            <Link href={`/${locale}/ai-tools`}>
               <Button variant="ghost">
                 {dict['home.viewAll']} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -107,9 +111,9 @@ export default function HomePage({ params }: { params: { locale: Locale } }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {popularAiTools.map((tool) => {
               const Icon = (Icons as any)[tool.icon] || Sparkles;
-              const content = tool.content[params.locale];
+              const content = tool.content[locale];
               return (
-                <Link key={tool.slug} href={`/${params.locale}/ai-tools/${tool.slug}`}>
+                <Link key={tool.slug} href={`/${locale}/ai-tools/${tool.slug}`}>
                   <Card className="h-full hover:shadow-lg transition-shadow">
                     <CardHeader>
                       <div className="flex items-center gap-3 mb-2">

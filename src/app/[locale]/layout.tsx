@@ -4,12 +4,15 @@ import { Footer } from '@/components/layout/Footer';
 import { Locale, locales } from '@/i18n/config';
 import { getDictionary } from '@/i18n/dictionaries';
 
+type LocaleParams = Promise<{ locale: Locale }>;
+
 export async function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
 }
 
-export async function generateMetadata({ params }: { params: { locale: Locale } }): Promise<Metadata> {
-  const dict = getDictionary(params.locale);
+export async function generateMetadata({ params }: { params: LocaleParams }): Promise<Metadata> {
+  const { locale } = await params;
+  const dict = getDictionary(locale);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://devtools-hub.com';
 
   return {
@@ -20,7 +23,7 @@ export async function generateMetadata({ params }: { params: { locale: Locale } 
     description: dict['home.description'],
     keywords: ['developer tools', 'online tools', 'json formatter', 'base64', 'uuid', 'ai tools'],
     alternates: {
-      canonical: `${siteUrl}/${params.locale}`,
+      canonical: `${siteUrl}/${locale}`,
       languages: {
         'en': `${siteUrl}/en`,
         'zh': `${siteUrl}/zh`,
@@ -28,24 +31,26 @@ export async function generateMetadata({ params }: { params: { locale: Locale } 
       },
     },
     openGraph: {
-      locale: params.locale,
-      alternateLocale: locales.filter(l => l !== params.locale),
+      locale,
+      alternateLocale: locales.filter(l => l !== locale),
     },
   };
 }
 
-export default function LocaleLayout({
+export default async function LocaleLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: Locale };
+  params: LocaleParams;
 }) {
+  const { locale } = await params;
+
   return (
     <>
-      <Header locale={params.locale} />
+      <Header locale={locale} />
       <main className="flex-1">{children}</main>
-      <Footer locale={params.locale} />
+      <Footer locale={locale} />
     </>
   );
 }
