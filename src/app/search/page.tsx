@@ -17,7 +17,7 @@ export default function SearchPage() {
   const handleSearch = (value: string) => {
     setQuery(value);
     if (value.trim()) {
-      const searchResults = searchAll(value);
+      const searchResults = searchAll(value, 'en');
       setResults(searchResults);
     } else {
       setResults([]);
@@ -59,6 +59,7 @@ export default function SearchPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {results.map((result) => {
                 const tool = result.item;
+                const content = tool.content.en;
                 const Icon = (Icons as any)[tool.icon] || (result.type === 'ai-tool' ? Sparkles : Code2);
                 const href = result.type === 'ai-tool' ? `/ai-tools/${tool.slug}` : `/tools/${tool.slug}`;
 
@@ -74,8 +75,8 @@ export default function SearchPage() {
                             {result.type === 'ai-tool' ? 'AI Tool' : 'Developer Tool'}
                           </Badge>
                         </div>
-                        <CardTitle className="text-lg">{tool.name}</CardTitle>
-                        <CardDescription>{tool.description}</CardDescription>
+                        <CardTitle className="text-lg">{content.name}</CardTitle>
+                        <CardDescription>{content.description}</CardDescription>
                       </CardHeader>
                     </Card>
                   </Link>

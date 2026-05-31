@@ -1,3 +1,4 @@
+import { Locale } from '@/i18n/config';
 import { tools, Tool } from '@/config/tools';
 import { aiTools, AiTool } from '@/config/aiTools';
 
@@ -7,7 +8,7 @@ export type SearchResult = {
   score: number;
 };
 
-export function searchAll(query: string): SearchResult[] {
+export function searchAll(query: string, locale: Locale = 'en'): SearchResult[] {
   if (!query || query.trim().length === 0) {
     return [];
   }
@@ -17,7 +18,7 @@ export function searchAll(query: string): SearchResult[] {
 
   // Search regular tools
   tools.forEach(tool => {
-    const score = calculateScore(tool, lowerQuery);
+    const score = calculateScore(tool, lowerQuery, locale);
     if (score > 0) {
       results.push({ type: 'tool', item: tool, score });
     }
@@ -25,7 +26,7 @@ export function searchAll(query: string): SearchResult[] {
 
   // Search AI tools
   aiTools.forEach(tool => {
-    const score = calculateScore(tool, lowerQuery);
+    const score = calculateScore(tool, lowerQuery, locale);
     if (score > 0) {
       results.push({ type: 'ai-tool', item: tool, score });
     }
@@ -35,15 +36,17 @@ export function searchAll(query: string): SearchResult[] {
   return results.sort((a, b) => b.score - a.score);
 }
 
-function calculateScore(tool: Tool | AiTool, query: string): number {
+function calculateScore(tool: Tool | AiTool, query: string, locale: Locale): number {
   let score = 0;
+  const content = tool.content[locale];
+  const keywords = tool.keywords[locale];
 
   // Exact name match (highest priority)
-  if (tool.name.toLowerCase() === query) {
+  if (content.name.toLowerCase() === query) {
     score += 100;
   }
   // Name contains query
-  else if (tool.name.toLowerCase().includes(query)) {
+  else if (content.name.toLowerCase().includes(query)) {
     score += 50;
   }
 
@@ -53,12 +56,12 @@ function calculateScore(tool: Tool | AiTool, query: string): number {
   }
 
   // Description match
-  if (tool.description.toLowerCase().includes(query)) {
+  if (content.description.toLowerCase().includes(query)) {
     score += 20;
   }
 
   // Keywords match
-  tool.keywords.forEach(keyword => {
+  keywords.forEach(keyword => {
     if (keyword.toLowerCase().includes(query)) {
       score += 30;
     }

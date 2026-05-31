@@ -21,7 +21,7 @@ export default function LocaleSearchPage({ params }: { params: LocaleParams }) {
   const handleSearch = (value: string) => {
     setQuery(value);
     if (value.trim()) {
-      setResults(searchAll(value));
+      setResults(searchAll(value, locale));
     } else {
       setResults([]);
     }
@@ -60,6 +60,7 @@ export default function LocaleSearchPage({ params }: { params: LocaleParams }) {
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {results.map((result) => {
                 const tool = result.item;
+                const content = tool.content[locale];
                 const Icon = (Icons as any)[tool.icon] || (result.type === 'ai-tool' ? Sparkles : Code2);
                 const href =
                   result.type === 'ai-tool'
@@ -78,8 +79,8 @@ export default function LocaleSearchPage({ params }: { params: LocaleParams }) {
                             {result.type === 'ai-tool' ? 'AI Tool' : 'Developer Tool'}
                           </Badge>
                         </div>
-                        <CardTitle className="text-lg">{tool.name}</CardTitle>
-                        <CardDescription>{tool.description}</CardDescription>
+                        <CardTitle className="text-lg">{content.name}</CardTitle>
+                        <CardDescription>{content.description}</CardDescription>
                       </CardHeader>
                     </Card>
                   </Link>
