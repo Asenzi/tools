@@ -43,3 +43,6 @@ prisma/*.db-journal
 *.swp
 *.swo
 *~
+
+# local tooling
+.playwright-mcp/
